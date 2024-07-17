@@ -2,9 +2,8 @@ import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import OccupancyGrid
 from std_msgs.msg import Header
-from collections import deque
+import yaml
 import time
-
 
 class OccupancyGridPublisher(Node):
     def __init__(self):
@@ -41,7 +40,7 @@ class OccupancyGridPublisher(Node):
 
         return objects
 
-    def publish_occupancy_grid(self, object_index, object_cells, grid_height, grid_width):
+    def publish_occupancy_grid(self, object_index, object_cells, grid_height, grid_width, map_info):
         # Initialize the occupancy grid data
         occupancy_data = [-1] * (grid_height * grid_width)
 
@@ -55,16 +54,7 @@ class OccupancyGridPublisher(Node):
         occupancy_grid_msg.header = Header()
         occupancy_grid_msg.header.stamp = self.get_clock().now().to_msg()
         occupancy_grid_msg.header.frame_id = 'map'
-        occupancy_grid_msg.info.width = grid_width
-        occupancy_grid_msg.info.height = grid_height
-        occupancy_grid_msg.info.resolution = 1.0
-        occupancy_grid_msg.info.origin.position.x = 0.0
-        occupancy_grid_msg.info.origin.position.y = 0.0
-        occupancy_grid_msg.info.origin.position.z = 0.0
-        occupancy_grid_msg.info.origin.orientation.x = 0.0
-        occupancy_grid_msg.info.origin.orientation.y = 0.0
-        occupancy_grid_msg.info.origin.orientation.z = 0.0
-        occupancy_grid_msg.info.origin.orientation.w = 1.0
+        occupancy_grid_msg.info = map_info
         occupancy_grid_msg.data = occupancy_data
 
         self.publisher.publish(occupancy_grid_msg)
@@ -90,9 +80,17 @@ class OccupancyGridPublisher(Node):
                     grid.append(row)
         return grid
 
+    def read_map_config(self, filename):
+        with open(filename, 'r') as file:
+            config = yaml.safe_load(file)
+        return config
+
     def main(self):
-        filename = 'map_data.txt'
-        grid = self.read_grid_from_file(filename)
+        # Load map data and configuration
+        map_filename = 'map.txt'
+        config_filename = 'map.yaml'
+        grid = self.read_grid_from_file(map_filename)
+        map_config = self.read_map_config(config_filename)
 
         height, width = self.get_grid_dimensions(grid)
         self.get_logger().info(f"Grid Height: {height}")
@@ -114,7 +112,30 @@ class OccupancyGridPublisher(Node):
             try:
                 selected_object_index = int(selected_object)
                 if 1 <= selected_object_index <= num_objects:
-                    self.publish_occupancy_grid(selected_object_index, objects[selected_object_index - 1], height, width)
+                    # Prepare map info using the configuration
+                    map_info = OccupancyGrid().info
+                    
+                    x_map_config = 0.0                    
+                    try: x_map_config = float(map_config['origin'][0])
+                    except: x_map_config = 0.0
+
+                    y_map_config = 0.0                    
+                    try: y_map_config = float(map_config['origin'][1])
+                    except: y_map_config = 0.0
+
+                    z_map_config = 0.0                    
+                    try: z_map_config = float(map_config['origin'][2])
+                    except: z_map_config = 0.0
+
+                    map_info.width = width
+                    map_info.height = height
+                    map_info.resolution = map_config['resolution']
+                    map_info.origin.position.x = x_map_config
+                    map_info.origin.position.y = y_map_config
+                    map_info.origin.position.z = z_map_config
+                    map_info.origin.orientation.w = 1.0
+
+                    self.publish_occupancy_grid(selected_object_index, objects[selected_object_index - 1], height, width, map_info)
                 else:
                     self.get_logger().info("Invalid object index!")
             except ValueError:

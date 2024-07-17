@@ -44,6 +44,11 @@ ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:
 python3 save_map.py
 ```
 
+
+**Copy map.yaml file which represents loaded map in same folder**
+
+It needs as it has configurations of the map  as height, width, resolution and so on. Example of map.yaml file is located in same folder, please replace with your actual map configuration keeping the same file name, otherwise change in code.
+
 ### Run to publish segmented maps
 
 ```bash

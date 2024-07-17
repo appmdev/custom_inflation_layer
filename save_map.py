@@ -43,7 +43,7 @@ class Mapper(Node):
         grid_map = np.array(self.response.map.data).reshape((self.response.map.info.height, self.response.map.info.width))
 
         # Save map data to a text file
-        self.save_map_data(grid_map, 'map_data.txt')
+        self.save_map_data(grid_map, 'map.txt')
 
 
 
