@@ -9,10 +9,20 @@ from geometry_msgs.msg import Pose
 from scipy.ndimage import binary_dilation
 import array
 from std_msgs.msg import Header  # Add this import for Header
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, QoSDurabilityPolicy
 
 class GlobalCostmapNode(Node):
     def __init__(self):
         super().__init__('global_costmap_node')
+        # Define QoS profile
+        qos_profile = QoSProfile(
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=10,
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            durability=QoSDurabilityPolicy.TRANSIENT_LOCAL
+        )
+        self.global_costmap_publisher = self.create_publisher(OccupancyGrid, '/global_costmap/costmap', qos_profile)
+        
         self.global_costmap_publisher = self.create_publisher(OccupancyGrid, '/merged_global_costmap', 10)
         self.submap_topics = ['/occupancy_grid_v1']
         self.submap_inflation = {'/occupancy_grid_v1': 2}
@@ -63,7 +73,7 @@ class GlobalCostmapNode(Node):
         structuring_element[mask] = True
 
         inflated_array = binary_dilation(original_array, structure=structuring_element)
-        inflated_array = inflated_array.astype(np.uint8) * 255
+        inflated_array = inflated_array.astype(np.uint8) * 99 #99 teal;	100 pink-purple;	50 purple light;	17 blue; 101 and higher green
         inflated_costmap_data = inflated_array.flatten().tolist()
 
         return inflated_costmap_data
