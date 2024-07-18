@@ -68,6 +68,10 @@ python3 custom_inflation.py
 
 **In RViz add map and subscribe to topic inflation**
 ```bash
+/global_costmap/costmap
+```
+**Previous topic used**
+```bash
 /merged_global_costmap
 ```
 **In terminal where inflation_pub.py script is running change number of map**
