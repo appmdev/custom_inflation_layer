@@ -8,7 +8,7 @@ from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, QoSDur
 
 class OccupancyGridPublisher(Node):
     def __init__(self):
-        super().__init__('occupancy_grid_publisher')
+        super().__init__('map_merging')
         # Define QoS profile
         self.qos_profile_v1 = QoSProfile(
             history=QoSHistoryPolicy.KEEP_LAST,
