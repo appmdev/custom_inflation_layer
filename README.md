@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Custom inflation layer ros2 implementation 
+Custom inflation layer ros2 Plugin implementation 
 
 ## Dependencies
 
@@ -23,7 +23,7 @@ cd ~/custom_inflation_layer
 ### Clone Repository
 
 ```bash
-git clone  https://github.com/appmdev/custom_inflation_layer.git
+git clone -b devel  https://github.com/appmdev/custom_inflation_layer.gitcd ~/custom_inflation_layer/custom_inflation_layer
 ```
 
 ### Launch Simulation 
@@ -49,25 +49,29 @@ python3 save_map.py
 
 It needs as it has configurations of the map  as height, width, resolution and so on. Example of map.yaml file is located in same folder, please replace with your actual map configuration keeping the same file name, otherwise change in code.
 
-
-### Run to publish appedned gridmap of submaps
-
-```bash
-python3 merged_maps.py
-```
-
 ### Run to publish segmented maps
 
 ```bash
-python3 occupancy_grid_objects_v3.py
+python3 inflation_pub.py
 ```
-**It will require 2 parameters:**
 
-**Insert number of segmented object (submap)**
+**In RViz add map and subscribe to topic**
+```bash
+/occupancy_grid_v1
+```
 
-**Insert custom integer number for virtual inflation of that object (0 means no virtual inflation)**
+### Run to publish custom inflation
 
-**Gridmap to be published on following topic**
+```bash
+python3 custom_inflation.py
+```
+
+**In RViz add map and subscribe to topic inflation**
 ```bash
 /global_costmap/costmap
 ```
+**Previous topic used**
+```bash
+/merged_global_costmap
+```
+**In terminal where inflation_pub.py script is running change number of map**
