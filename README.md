@@ -52,7 +52,7 @@ It needs as it has configurations of the map  as height, width, resolution and s
 ### Run to publish appedned gridmap of submaps
 
 ```bash
-python3 merged_maps.py
+python3 srv_merged_maps.py
 ```
 
 ### Run to publish segmented maps
@@ -65,6 +65,20 @@ python3 occupancy_grid_objects_v3.py
 **Insert number of segmented object (submap)**
 
 **Insert custom integer number for virtual inflation of that object (0 means no virtual inflation)**
+
+### Create Folder to store temporary map
+
+```bash
+mkdir -p ~/map
+```
+### Run to publish saved map after each appended gridmap of submaps
+
+**Temporary map will be saved in folder "map"**
+
+
+```bash
+python3 python3 load_map.py
+```
 
 **Gridmap to be published on following topic**
 ```bash
